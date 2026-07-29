@@ -11,8 +11,6 @@ export type InventoryRow = {
 async function requireClient() {
   const client = createClient();
   if (!client) throw new Error('Supabase 尚未設定');
-  const { data: { user } } = await client.auth.getUser();
-  if (!user) throw new Error('請先登入');
   return client;
 }
 
