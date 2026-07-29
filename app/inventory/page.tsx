@@ -60,7 +60,7 @@ export default function InventoryPage() {
     <section className="side-panel inventory-form"><h2>新增食材</h2><div className="inventory-form-grid">
       <label>名稱<input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="例如：雞蛋" /></label>
       <label>單位<input value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} /></label>
-      <label>目前數量<input type="number" min="0" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })} /></label>
+      <label>增加數量<input type="number" min="0" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })} /></label>
       <label>安全庫存<input type="number" min="0" value={form.safetyStock} onChange={(e) => setForm({ ...form, safetyStock: Number(e.target.value) })} /></label>
     </div><button className="primary-button" onClick={add}>新增食材</button>{message && <div className="notice">{message}</div>}</section>
     <section className="inventory-table"><div className="table-header"><span>食材</span><span>目前庫存</span><span>安全庫存</span><span>操作</span></div>
