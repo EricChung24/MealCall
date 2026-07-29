@@ -15,3 +15,4 @@ body{font-family:"DFKai-SB","BiauKai","標楷體",Arial,sans-serif;font-size:15p
  body{font-family:"PingFang TC","PingFang SC","Microsoft JhengHei",sans-serif}
  .meal-actions{display:flex;gap:12px;align-items:center}.cancel-button{background:none;color:#b84b43;font-size:12px;padding:0;font-weight:700}
  .auth-nav,.global-login-link{top:auto!important;right:18px!important;bottom:18px!important}@media(max-width:700px){.auth-nav,.global-login-link{right:12px!important;bottom:12px!important}}
+ .auth-nav{position:fixed!important;right:20px!important;bottom:20px!important;top:auto!important;z-index:1000;background:#fff;border:1px solid #cbd9ce;border-radius:14px;padding:10px 12px 10px 15px;box-shadow:0 8px 24px #19382b2b;display:flex;align-items:center;gap:12px}.auth-nav span{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.auth-nav button{border:0;background:#21684f;color:#fff;border-radius:8px;padding:8px 12px}
