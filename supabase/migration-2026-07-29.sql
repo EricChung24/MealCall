@@ -25,6 +25,13 @@ for insert with check (
   )
 );
 
+drop policy if exists "members can create ingredients" on public.ingredients;
+create policy "members can create ingredients" on public.ingredients for insert with check (public.is_household_member(household_id));
+drop policy if exists "members can create inventory" on public.inventory;
+create policy "members can create inventory" on public.inventory for insert with check (exists(select 1 from public.ingredients i where i.id = ingredient_id and public.is_household_member(i.household_id)));
+drop policy if exists "members can update inventory" on public.inventory;
+create policy "members can update inventory" on public.inventory for update using (exists(select 1 from public.ingredients i where i.id = ingredient_id and public.is_household_member(i.household_id)));
+
 drop policy if exists "admin can manage households" on public.households;
 create policy "admin can manage households" on public.households
 for all using (public.is_admin());
