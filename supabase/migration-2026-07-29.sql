@@ -7,6 +7,9 @@ $$;
 drop policy if exists "authenticated can create household" on public.households;
 create policy "authenticated can create household" on public.households
 for insert with check (auth.uid() is not null);
+drop policy if exists "authenticated can find default household" on public.households;
+create policy "authenticated can find default household" on public.households
+for select using (name = '鍾家冰箱' and auth.uid() is not null);
 
 drop policy if exists "users can join household" on public.household_members;
 create policy "users can join household" on public.household_members

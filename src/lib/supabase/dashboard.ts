@@ -7,9 +7,10 @@ export async function loadDashboard(){
   let {data:member,error}=await supabase.from('household_members').select('household_id').eq('user_id',user.id).maybeSingle();
   if(error)return null;
   if(!member){
-    const created=await supabase.from('households').insert({name:'鍾家冰箱'}).select('id').single();
-    if(created.error||!created.data)return null;
-    const joined=await supabase.from('household_members').insert({household_id:created.data.id,user_id:user.id,role_id:'admin',role_name:'管理員',permissions:['roles:manage','members:manage','inventory:edit','meal:create','meal:edit','meal:publish','meal:complete','inventory:view']}).select('household_id').single();
+    const existing=await supabase.from('households').select('id').eq('name','鍾家冰箱').order('created_at',{ascending:true}).limit(1).maybeSingle();
+    const household=existing.data||((await supabase.from('households').insert({name:'鍾家冰箱'}).select('id').single()).data);
+    if(!household)return null;
+    const joined=await supabase.from('household_members').insert({household_id:household.id,user_id:user.id,role_id:'viewer',role_name:'家庭成員',permissions:['inventory:view']}).select('household_id').single();
     if(joined.error||!joined.data)return null; member=joined.data;
   }
   const householdId=member.household_id;
