@@ -1,4 +1,16 @@
 alter table public.meals alter column cook_id drop not null;
+drop policy if exists "public can view default household" on public.households;
+create policy "public can view default household" on public.households for select using (name='鍾家冰箱');
+drop policy if exists "public can view household members" on public.household_members;
+create policy "public can view household members" on public.household_members for select using (true);
+drop policy if exists "public can view default ingredients" on public.ingredients;
+create policy "public can view default ingredients" on public.ingredients for select using (exists(select 1 from public.households h where h.id=household_id and h.name='鍾家冰箱'));
+drop policy if exists "public can view default inventory" on public.inventory;
+create policy "public can view default inventory" on public.inventory for select using (exists(select 1 from public.ingredients i join public.households h on h.id=i.household_id where i.id=ingredient_id and h.name='鍾家冰箱'));
+drop policy if exists "public can view default meals" on public.meals;
+create policy "public can view default meals" on public.meals for select using (exists(select 1 from public.households h where h.id=household_id and h.name='鍾家冰箱'));
+drop policy if exists "public can view default meal ingredients" on public.meal_ingredients;
+create policy "public can view default meal ingredients" on public.meal_ingredients for select using (exists(select 1 from public.meals m join public.households h on h.id=m.household_id where m.id=meal_id and h.name='鍾家冰箱'));
 drop policy if exists "public can create ingredients" on public.ingredients;
 create policy "public can create ingredients" on public.ingredients for insert with check (exists(select 1 from public.households h where h.id=household_id and h.name='鍾家冰箱'));
 drop policy if exists "public can update ingredients" on public.ingredients;
