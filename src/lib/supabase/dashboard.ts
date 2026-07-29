@@ -3,17 +3,20 @@ import {Ingredient,InventoryItem,Meal} from '../../domain/types';
 
 export async function loadDashboard(){
   const supabase=createClient(); if(!supabase)return null;
-  const {data:{user}}=await supabase.auth.getUser(); if(!user)return null;
-  let {data:member,error}=await supabase.from('household_members').select('household_id').eq('user_id',user.id).maybeSingle();
+  const {data:{user}}=await supabase.auth.getUser();
+  let member=null; let error=null;
+  if(user){const result=await supabase.from('household_members').select('household_id').eq('user_id',user.id).maybeSingle();member=result.data;error=result.error;}
+  if(!user&&!member){const result=await supabase.from('households').select('id').eq('name','鍾家冰箱').order('created_at',{ascending:true}).limit(1).maybeSingle();member=result.data;error=result.error;}
   if(error)return null;
-  if(!member){
+  if(!member&&user){
     const existing=await supabase.from('households').select('id').eq('name','鍾家冰箱').order('created_at',{ascending:true}).limit(1).maybeSingle();
     const household=existing.data||((await supabase.from('households').insert({name:'鍾家冰箱'}).select('id').single()).data);
     if(!household)return null;
     const joined=await supabase.from('household_members').insert({household_id:household.id,user_id:user.id,role_id:'viewer',role_name:'家庭成員',permissions:['inventory:view']}).select('household_id').single();
     if(joined.error||!joined.data)return null; member=joined.data;
   }
-  const householdId=member.household_id;
+  if(!member)return null;
+  const householdId='household_id' in member ? member.household_id : member.id;
   const [{data:ings},{data:mealRows}]=await Promise.all([
     supabase.from('ingredients').select('id,name,unit,safety_stock').eq('household_id',householdId),
     supabase.from('meals').select('id,date,slot,title,cook_id,status,meal_ingredients(ingredient_id,planned_amount,reserved_amount,consumed_amount)').eq('household_id',householdId).order('date')
