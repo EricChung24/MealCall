@@ -62,6 +62,18 @@ returns boolean language sql security definer set search_path = public as $$
   select exists(select 1 from public.household_members where household_id = target_household and user_id = auth.uid());
 $$;
 
+create or replace function public.is_admin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select lower(coalesce(auth.jwt() ->> 'email', '')) = 'lf2net679@yahoo.com.tw';
+$$;
+
+create policy "admin can manage households" on public.households for all using (public.is_admin());
+create policy "admin can manage members" on public.household_members for all using (public.is_admin());
+create policy "admin can manage ingredients" on public.ingredients for all using (public.is_admin());
+create policy "admin can manage inventory" on public.inventory for all using (public.is_admin());
+create policy "admin can manage meals" on public.meals for all using (public.is_admin());
+create policy "admin can manage meal ingredients" on public.meal_ingredients for all using (public.is_admin());
+
 create policy "members can read households" on public.households for select using (public.is_household_member(id));
 create policy "members can read members" on public.household_members for select using (public.is_household_member(household_id));
 create policy "members can read ingredients" on public.ingredients for select using (public.is_household_member(household_id));
