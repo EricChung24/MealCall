@@ -80,3 +80,7 @@ create policy "members can read ingredients" on public.ingredients for select us
 create policy "members can read meals" on public.meals for select using (public.is_household_member(household_id));
 create policy "members can read inventory" on public.inventory for select using (exists(select 1 from public.ingredients i where i.id = ingredient_id and public.is_household_member(i.household_id)));
 create policy "members can read meal ingredients" on public.meal_ingredients for select using (exists(select 1 from public.meals m where m.id = meal_id and public.is_household_member(m.household_id)));
+create policy "authenticated can create household" on public.households for insert with check (auth.uid() is not null);
+create policy "users can join household" on public.household_members for insert with check (user_id = auth.uid());
+create policy "members can write meals" on public.meals for insert with check (public.is_household_member(household_id));
+create policy "members can write meal ingredients" on public.meal_ingredients for insert with check (exists(select 1 from public.meals m where m.id = meal_id and public.is_household_member(m.household_id)));

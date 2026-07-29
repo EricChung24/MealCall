@@ -1,0 +1,3 @@
+'use client';
+import {useEffect,useState} from 'react'; import {createClient} from '../../lib/supabase/client';
+export function AuthNav(){const [email,setEmail]=useState<string|null>(null);useEffect(()=>{const client=createClient();if(!client)return;client.auth.getUser().then(({data})=>setEmail(data.user?.email??null));const {data}=client.auth.onAuthStateChange((_event,session)=>setEmail(session?.user?.email??null));return()=>data.subscription.unsubscribe()},[]);if(email)return <div className="auth-nav"><span>{email}</span><button onClick={async()=>{const client=createClient();await client?.auth.signOut();window.location.href='/login'}}>登出</button></div>;return <a className="global-login-link" href="/login">會員登入／註冊</a>}

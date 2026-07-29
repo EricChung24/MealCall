@@ -1,7 +1,6 @@
 'use client';
 import {useEffect,useMemo,useState} from 'react';
 import {Meal} from '../src/domain/types';
-import {ingredients as seedIngredients,inventory as seedInventory,meals as seedMeals} from '../src/data/mockData';
 import {availableFor,publishMeal,reservedFor,completeMeal,cancelMeal} from '../src/domain/mealInventory';
 import {loadDashboard,saveMeal,setMealStatus} from '../src/lib/supabase/dashboard';
 import {MealBoard} from '../src/components/dashboard/MealBoard';
@@ -9,7 +8,7 @@ import {InventorySummary} from '../src/components/dashboard/InventorySummary';
 import {MealForm} from '../src/components/meals/MealForm';
 
 export default function Home(){
-  const [meals,setMeals]=useState(seedMeals); const [inventory,setInventory]=useState(seedInventory); const [ingredients,setIngredients]=useState(seedIngredients);
+  const [meals,setMeals]=useState<Meal[]>([]); const [inventory,setInventory]=useState<import('../src/domain/types').InventoryItem[]>([]); const [ingredients,setIngredients]=useState<import('../src/domain/types').Ingredient[]>([]);
   const [householdId,setHouseholdId]=useState<string>(); const [view,setView]=useState<'dashboard'|'inventory'>('dashboard'); const [form,setForm]=useState(false); const [notice,setNotice]=useState(''); const [filter,setFilter]=useState('全部'); const [loading,setLoading]=useState(true);
   useEffect(()=>{loadDashboard().then(data=>{if(data){setMeals(data.meals);setInventory(data.inventory);setIngredients(data.ingredients);setHouseholdId(data.householdId)}}).finally(()=>setLoading(false))},[]);
   const save=async(draft:Meal)=>{const result=publishMeal(draft,meals,inventory,ingredients);if(result.error){setNotice(`無法發布：${result.error}`);return}try{const id=householdId?await saveMeal(result.meal,householdId):result.meal.id;const saved={...result.meal,id};setMeals([...meals,saved]);setNotice('餐點已發布，食材已標記為保留。');setForm(false)}catch(e){setNotice(e instanceof Error?e.message:'發布失敗')}};
