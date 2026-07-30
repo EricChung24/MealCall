@@ -9,6 +9,7 @@ export default function InventoryPage() {
   const [householdId, setHouseholdId] = useState('');
   const [form, setForm] = useState({ name: '', unit: '份', quantity: 0, safetyStock: 1 });
   const [message, setMessage] = useState('');
+  const [search, setSearch] = useState('');
 
   const refresh = async () => {
     const data = await loadDashboard();
@@ -55,6 +56,7 @@ export default function InventoryPage() {
     catch (error) { setMessage(error instanceof Error ? error.message : '刪除失敗'); }
   };
 
+  const visibleRows = rows.filter((row) => row.name.toLowerCase().includes(search.trim().toLowerCase()));
   return <main className="content">
     <div className="page-heading compact"><div><a className="back-link" href="/">← 回到看板</a><h1>冰箱庫存</h1><p>新增食材、調整數量與安全庫存。</p></div></div>
     <section className="side-panel inventory-form"><h2>新增食材</h2><div className="inventory-form-grid">
@@ -63,9 +65,9 @@ export default function InventoryPage() {
       <label>增加數量<input type="number" min="0" value={form.quantity} onChange={(e) => setForm({ ...form, quantity: Number(e.target.value) })} /></label>
       <label>安全庫存<input type="number" min="0" value={form.safetyStock} onChange={(e) => setForm({ ...form, safetyStock: Number(e.target.value) })} /></label>
     </div><button className="primary-button" onClick={add}>新增食材</button>{message && <div className="notice">{message}</div>}</section>
-    <section className="inventory-table"><div className="table-header"><span>食材</span><span>目前庫存</span><span>安全庫存</span><span>操作</span></div>
-      {rows.length === 0 && <div className="empty-state">尚未有食材，請先新增。</div>}
-      {rows.map((row) => <div className="table-row inventory-manage-row" key={row.id}><span className="food-name">{row.name}<small>{row.unit}</small></span><span><button className="quantity-button" onClick={() => void adjust(row, -1)}>−</button><b className="quantity-value">{row.quantity}</b><button className="quantity-button" onClick={() => void adjust(row, 1)}>＋</button></span><span>{row.safetyStock}</span><span><button onClick={() => void editSafety(row)}>編輯</button><button onClick={() => void remove(row)}>刪除</button></span></div>)}
+    <section className="inventory-table"><div className="inventory-search"><input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="搜尋食材…" /></div><div className="table-header"><span>食材</span><span>目前庫存</span><span>安全庫存</span><span>操作</span></div>
+      {visibleRows.length === 0 && <div className="empty-state">{rows.length===0?'尚未有食材，請先新增。':'找不到符合的食材。'}</div>}
+      {visibleRows.map((row) => <div className="table-row inventory-manage-row" key={row.id}><span className="food-name">{row.name}<small>{row.unit}</small></span><span><button className="quantity-button" onClick={() => void adjust(row, -1)}>−</button><b className="quantity-value">{row.quantity}</b><button className="quantity-button" onClick={() => void adjust(row, 1)}>＋</button></span><span>{row.safetyStock}</span><span><button onClick={() => void editSafety(row)}>編輯</button><button onClick={() => void remove(row)}>刪除</button></span></div>)}
     </section>
   </main>;
 }
